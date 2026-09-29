@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="ms" data-bs-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <title>Portal Semakan MUET 2026</title>
+
+  <!-- Google Font: Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <!-- Chart.js Library -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --primary-color: #1e3c72;
+      --secondary-color: #2a5298;
+      --accent-color: #0d6efd;
+      --border-radius-custom: 14px;
+    }
+
+    body { 
+      background-color: #f4f6f9; 
+      font-family: 'Poppins', sans-serif; 
+      transition: background-color 0.3s, color 0.3s; 
+    }
+
+    /* Hero Header & Wave Styling */
+    .hero-header { 
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); 
+      color: white; 
+      padding: 2.8rem 0 3.5rem 0; 
+      position: relative; 
+      overflow: hidden;
+    }
+    .hero-header .wave-divider {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      overflow: hidden;
+      line-height: 0;
+    }
+    .hero-header .wave-divider svg {
+      position: relative;
+      display: block;
+      width: calc(100% + 1.3px);
+      height: 35px;
+    }
+
+    /* Glassmorphic & Modern Cards */
+    .card {
+      border: none;
+      border-radius: var(--border-radius-custom);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    /* Countdown Timer Display Block */
+    .timer-card-item {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 12px;
+      padding: 10px 5px;
+      border: 1px solid rgba(13, 110, 253, 0.2);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+      animation: pulse 2s infinite ease-in-out;
+    }
+    .timer-val {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      line-height: 1.1;
+    }
+    .timer-unit {
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: #6c757d;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Style Kotak Meja */
+    .desk-box { 
+      border: 2px solid #dee2e6; 
+      border-radius: 10px; 
+      padding: 8px 4px; 
+      text-align: center; 
+      background-color: #ffffff; 
+      min-height: 85px; 
+      transition: all 0.2s ease-in-out;
+    }
+    .desk-box.occupied { border-color: #adb5bd; background-color: #f8f9fa; }
+    .desk-box.checked-in { border-color: #198754; background-color: #e8f5e9; }
+    .desk-box.self-desk { 
+      border-color: #198754; 
+      background-color: #d1e7dd; 
+      box-shadow: 0 0 15px rgba(25, 135, 84, 0.5); 
+      transform: scale(1.05);
+    }
+    .desk-box.self-desk:hover { transform: scale(1.08); }
+    
+    .desk-number { font-weight: 700; font-size: 0.95rem; color: #495057; }
+    .desk-box.self-desk .desk-number { color: #0f5132; font-size: 1.15rem; }
+    .candidate-name { font-size: 0.72rem; color: #495057; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+    
+    /* Stage Indicator Banner */
+    .stage-indicator {
+      background: linear-gradient(90deg, #495057, #212529);
+      color: #ffffff;
+      border-radius: 8px;
+      padding: 8px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+    }
+
+    /* Custom Ticker / Announcement */
+    .announcement-ticker {
+      background: #fff3cd;
+      border: 1px solid #ffe69c;
+      border-radius: 10px;
+      color: #664d03;
+    }
+
+    /* Floating Action Buttons */
+    .floating-btn-container {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .btn-float {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease;
+    }
+    .btn-float:hover { transform: scale(1.1); }
+
+    .admin-only { display: none !important; }
+    .admin-badge { position: absolute; top: 15px; right: 20px; z-index: 10; }
+    .theme-badge { position: absolute; top: 15px; left: 20px; z-index: 10; }
+
+    /* Animation */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in { animation: fadeInUp 0.4s ease-out forwards; }
+
+    /* Dark Mode Overrides */
+    [data-bs-theme="dark"] body { background-color: #121212; color: #e0e0e0; }
+    [data-bs-theme="dark"] .card { background-color: #1e1e1e; border-color: #2c2c2c; }
+    [data-bs-theme="dark"] .bg-white { background-color: #1e1e1e !important; color: #e0e0e0 !important; }
+    [data-bs-theme="dark"] .timer-card-item { background-color: #2b2b2b; border-color: #444; }
+    [data-bs-theme="dark"] .timer-val { color: #6610f2; color: #0d6efd; }
+    [data-bs-theme="dark"] .desk-box { background-color: #2b3035; border-color: #495057; }
+    [data-bs-theme="dark"] .desk-box.occupied { background-color: #212529; border-color: #343a40; }
+    [data-bs-theme="dark"] .desk-box.self-desk { background-color: #0f5132; border-color: #198754; }
+    [data-bs-theme="dark"] .desk-box.self-desk .desk-number { color: #20c997; }
+    [data-bs-theme="dark"] .desk-number { color: #e0e0e0; }
+    [data-bs-theme="dark"] .candidate-name { color: #adb5bd; }
+    [data-bs-theme="dark"] .table { color: #e0e0e0; }
+    [data-bs-theme="dark"] .announcement-ticker { background-color: #2c2000; border-color: #664d03; color: #ffda6a; }
+    [data-bs-theme="dark"] .hero-header .wave-divider svg path { fill: #121212; }
+    [data-bs-theme="light"] .hero-header .wave-divider svg path { fill: #f4f6f9; }
+  </style>
+</head>
+<body>
+
+  <!-- Header Portal -->
+  <div class="hero-header text-center shadow-sm">
+    <!-- Butang Tukar Tema Gelap/Terang -->
+    <div class="theme-badge">
+      <button class="btn btn-sm btn-outline-light rounded-pill px-3 shadow-sm" onclick="toggleTheme()" id="btnThemeToggle">
+        <i class="fa-solid fa-moon me-1" id="themeIcon"></i> <span id="themeText">Mod Gelap</span>
+      </button>
+    </div>
+
+    <!-- Mod Pengawas / Admin -->
+    <div class="admin-badge">
+      <button id="btnLogin" class="btn btn-sm btn-outline-light rounded-pill px-3 shadow-sm" onclick="showLoginModal()">
+        <i class="fa-solid fa-user-shield me-1"></i> Log Masuk Pengawas
+      </button>
+      <div id="adminStatus" class="d-none">
+        <span class="badge bg-warning text-dark me-1 px-3 py-2 rounded-pill"><i class="fa-solid fa-lock-open me-1"></i> Mod Admin Aktif</span>
+        <button class="btn btn-sm btn-danger rounded-pill px-3" onclick="logoutAdmin()"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
+      </div>
+    </div>
+
+    <div class="container relative-position">
+      <h2 class="fw-bold mb-1"><i class="fa-solid fa-graduation-cap me-2"></i>Portal Semakan MUET 2026</h2>
+      <p class="mb-0 text-light opacity-75 small">Semakan Kedudukan Meja Calon & Navigasi Dewan Peperiksaan</p>
+    </div>
+
+    <!-- Hiasan Gelombang Wave SVG -->
+    <div class="wave-divider">
+      <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+        <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C59.71,118.37,130.83,121.61,192,117.8,236,115,279.13,91.8,321.39,56.44Z"></path>
+      </svg>
+    </div>
+  </div>
+
+  <div class="container mb-5" style="margin-top: -10px;">
+    
+    <!-- BARIS PENGUMUMAN MESRA -->
+    <div class="announcement-ticker p-2 px-3 mb-4 shadow-sm d-flex align-items-center">
+      <span class="badge bg-danger text-white me-2 px-2 py-1"><i class="fa-solid fa-bullhorn me-1"></i> PERINGATAN</span>
+      <marquee behavior="scroll" direction="left" scrollamount="5" class="small fw-medium mb-0">
+        Calon diwajibkan membawa MyKad asal & Slip Pendaftaran Peperiksaan MUET. Sila patuhi etika berpakaian rasmi peperiksaan dan hadir 30 minit lebih awal ke dewan.
+      </marquee>
+    </div>
+
+    <!-- PEMASA DETIK (COUNTDOWN TIMER KOD BLOK - UJIAN BERTULIS SAHAJA) -->
+    <div class="row text-center justify-content-center mb-4">
+      <div class="col-md-9 col-lg-7">
+        <div class="p-3 bg-white rounded-4 shadow-sm border border-light">
+          <small class="fw-bold text-primary d-block mb-2"><i class="fa-solid fa-clock me-1"></i> BAKI MASA UJIAN BERTULIS (17 OKTOBER 2026)</small>
+          
+          <div class="row g-2 justify-content-center" id="countdownContainer">
+            <div class="col-3 col-sm-2">
+              <div class="timer-card-item">
+                <div id="countDays" class="timer-val">00</div>
+                <div class="timer-unit">Hari</div>
+              </div>
+            </div>
+            <div class="col-3 col-sm-2">
+              <div class="timer-card-item">
+                <div id="countHours" class="timer-val">00</div>
+                <div class="timer-unit">Jam</div>
+              </div>
+            </div>
+            <div class="col-3 col-sm-2">
+              <div class="timer-card-item">
+                <div id="countMins" class="timer-val">00</div>
+                <div class="timer-unit">Minit</div>
+              </div>
+            </div>
+            <div class="col-3 col-sm-2">
+              <div class="timer-card-item">
+                <div id="countSecs" class="timer-val">00</div>
+                <div class="timer-unit">Saat</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Menu Utama Tab -->
+    <ul class="nav nav-pills nav-justified bg-white p-2 rounded-4 shadow-sm mb-4 border" id="muetTab" role="tablist">
+      <!-- Akses Calon -->
+      <li class="nav-item">
+        <button class="nav-link active fw-bold py-2.5" id="search-tab" data-bs-toggle="tab" data-bs-target="#search-panel" role="tab">
+          <i class="fa-solid fa-magnifying-glass me-2"></i>Semakan Calon
+        </button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link fw-bold py-2.5" id="center-plan-tab" data-bs-toggle="tab" data-bs-target="#center-plan-panel" role="tab">
+          <i class="fa-solid fa-map-location-dot me-2"></i>Pelan Pusat
+        </button>
+      </li>
+
+      <!-- Terhad untuk Admin / Pengawas -->
+      <li class="nav-item admin-only">
+        <button class="nav-link fw-bold text-danger py-2.5" id="seating-tab" data-bs-toggle="tab" data-bs-target="#seating-panel" role="tab" onclick="loadLocations()">
+          <i class="fa-solid fa-chair me-2"></i>Grid Penuh Dewan (Admin)
+        </button>
+      </li>
+      <li class="nav-item admin-only">
+        <button class="nav-link fw-bold text-danger py-2.5" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics-panel" role="tab" onclick="loadAnalytics()">
+          <i class="fa-solid fa-chart-pie me-2"></i>Analisis & Carta (Admin)
+        </button>
+      </li>
+    </ul>
+
+    <!-- Kandungan Tab -->
+    <div class="tab-content">
+      
+      <!-- 1. PANEL SEMAKAN CALON & PELAN MEJA ANONYMIZED (PUBLIC) -->
+      <div class="tab-pane fade show active" id="search-panel" role="tabpanel">
+        <div class="card shadow-sm border-0 col-md-9 mx-auto mb-4">
+          <div class="card-body p-4 text-center">
+            <h5 class="card-title fw-bold text-primary mb-2">Semakan Maklumat Diri Calon</h5>
+            <p class="text-muted small mb-3">Masukkan No. Kad Pengenalan (tanpa sempang) atau No. Indeks Peperiksaan anda.</p>
+            <div class="input-group input-group-lg mb-2 shadow-sm rounded-3 overflow-hidden">
+              <input type="text" id="searchInput" class="form-control border-0 bg-light fs-6" placeholder="Cth: 040512105544 / KP001..." onkeypress="if(event.key==='Enter') performSearch()">
+              <button class="btn btn-primary px-4 fw-bold" onclick="performSearch()"><i class="fa-solid fa-search me-1"></i> Cari</button>
+            </div>
+            <div id="searchSpinner" class="text-center d-none my-4">
+              <div class="spinner-border text-primary" role="status"></div>
+              <p class="text-muted small mt-2">Mencari rekod anda...</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="searchResults"></div>
+      </div>
+
+      <!-- 2. PANEL PELAN PUSAT (PUBLIC) WITH SUB-TABS -->
+      <div class="tab-pane fade" id="center-plan-panel" role="tabpanel">
+        
+        <!-- Sub-pills Navigasi Pelan -->
+        <ul class="nav nav-pills mb-4 justify-content-center bg-white p-2 rounded-4 shadow-sm border" id="subPlanTab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active fw-bold" id="plan-written-tab" data-bs-toggle="pill" data-bs-target="#plan-written" type="button" role="tab">
+              <i class="fa-solid fa-pen-nib me-2"></i>Pelan Ujian Bertulis
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold" id="plan-speaking-tab" data-bs-toggle="pill" data-bs-target="#plan-speaking" type="button" role="tab">
+              <i class="fa-solid fa-comments me-2"></i>Pelan MUET Speaking
+            </button>
+          </li>
+        </ul>
+
+        <div class="tab-content" id="subPlanTabContent">
+          <!-- Sub Tab 1: Pelan Ujian Bertulis -->
+          <div class="tab-pane fade show active" id="plan-written" role="tabpanel">
+            <div class="d-flex justify-content-between align-items-center bg-white p-3 rounded-4 shadow-sm mb-3">
+              <div>
+                <h6 class="fw-bold mb-1 text-primary"><i class="fa-solid fa-file-pdf me-2"></i>Pelan Lokasi Pusat - Ujian Bertulis</h6>
+                <p class="text-muted small mb-0">Rujukan lokasi dewan, blok tutorial, dan aras untuk Ujian Bertulis.</p>
+              </div>
+              <a href="https://drive.google.com/file/d/1hOtcWS7t8fw8_DL7tx0woV-U2iaUzTIp/view?usp=sharing" target="_blank" class="btn btn-outline-danger btn-sm rounded-pill fw-bold">
+                <i class="fa-solid fa-up-right-from-square me-1"></i> Buka PDF Rasmi
+              </a>
+            </div>
+
+            <div class="card shadow-sm border-0">
+              <div class="card-body p-2 text-center">
+                <iframe 
+                  src="https://drive.google.com/file/d/1hOtcWS7t8fw8_DL7tx0woV-U2iaUzTIp/preview" 
+                  width="100%" 
+                  height="650px" 
+                  style="border: none; border-radius: 8px;"
+                  allow="autoplay">
+                </iframe>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sub Tab 2: Pelan MUET Speaking -->
+          <div class="tab-pane fade" id="plan-speaking" role="tabpanel">
+            <div class="d-flex justify-content-between align-items-center bg-white p-3 rounded-4 shadow-sm mb-3">
+              <div>
+                <h6 class="fw-bold mb-1 text-warning text-dark"><i class="fa-solid fa-file-pdf me-2"></i>Pelan Lokasi Pusat - MUET Speaking</h6>
+                <p class="text-muted small mb-0">Rujukan bilik kuarantin, bilik ujian & laluan calon MUET Speaking.</p>
+              </div>
+              <a href="https://drive.google.com/file/d/1znh2y9qQVFUP-4fdF05YH7HUR6cT69kn/view?usp=sharing" target="_blank" class="btn btn-outline-warning text-dark btn-sm rounded-pill fw-bold">
+                <i class="fa-solid fa-up-right-from-square me-1"></i> Buka PDF Rasmi
+              </a>
+            </div>
+
+            <div class="card shadow-sm border-0">
+              <div class="card-body p-2 text-center">
+                <iframe 
+                  src="https://drive.google.com/file/d/1znh2y9qQVFUP-4fdF05YH7HUR6cT69kn/preview" 
+                  width="100%" 
+                  height="650px" 
+                  style="border: none; border-radius: 8px;"
+                  allow="autoplay">
+                </iframe>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 3. PANEL GRID TEMPAT DUDUK PENUH (ADMIN ONLY) -->
+      <div class="tab-pane fade" id="seating-panel" role="tabpanel">
+        <div class="card shadow-sm border-0 mb-4">
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col-md-5">
+                <label class="fw-bold mb-1">Pilih Lokasi Dewan / Bilik:</label>
+                <select id="locationSelect" class="form-select rounded-3" onchange="renderSeatingPlan()">
+                  <option value="">-- Pilih Lokasi --</option>
+                </select>
+              </div>
+              <div class="col-md-7 text-md-end text-muted small mt-3 mt-md-0">
+                <span class="badge bg-success me-1">Petunjuk:</span> Kotak Hijau = Calon Telah Buat Semakan Online
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="seatingGridContainer"></div>
+      </div>
+
+      <!-- 4. PANEL ANALISIS & STATISTIK (ADMIN ONLY) -->
+      <div class="tab-pane fade" id="analytics-panel" role="tabpanel">
+        <div id="analyticsContainer">
+          <div class="text-center my-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="text-muted small mt-2">Menyediakan statistik & carta calon...</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FLOATING ACTION BUTTONS (BANTUAN & SCROLL TO TOP) -->
+  <div class="floating-btn-container">
+    <button class="btn btn-primary btn-float text-white shadow" onclick="showFaqModal()" title="Soalan Lazim / Bantuan">
+      <i class="fa-solid fa-circle-question fs-5"></i>
+    </button>
+    <button class="btn btn-secondary btn-float text-white shadow d-none" id="btnScrollTop" onclick="scrollToTop()" title="Ke Atas">
+      <i class="fa-solid fa-arrow-up fs-5"></i>
+    </button>
+  </div>
+
+  <!-- Modal Soalan Lazim (FAQ / Panduan) -->
+  <div class="modal fade" id="faqModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-primary text-white p-3">
+          <h6 class="modal-title fw-bold"><i class="fa-solid fa-circle-info me-2"></i>Panduan & Soalan Lazim</h6>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="accordion accordion-flush" id="faqAccordion">
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                  Apakah dokumen wajib dibawakan?
+                </button>
+              </h2>
+              <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                <div class="accordion-body text-muted small">
+                  Anda wajib membawa **MyKad Asal** dan **Slip Pendaftaran MUET Rasmi**. Anda juga disyorkan mencetak Slip Kedudukan Meja dari portal ini.
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                  Bagaimana jika nombor meja tidak ditemui?
+                </button>
+              </h2>
+              <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                <div class="accordion-body text-muted small">
+                  Sila pastikan anda memasukkan No. Kad Pengenalan tanpa sempang atau ejaan nama yang betul. Jika masih tiada, sila berhubung dengan Pengawas Peperiksaan di Kaunter Semakan Pusat.
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                  Waktu pintu dewan peperiksaan dibuka?
+                </button>
+              </h2>
+              <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                <div class="accordion-body text-muted small">
+                  Dewan dibuka 30 minit sebelum peperiksaan bermula. Sila hadir awal bagi mengelakkan kesesakan.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Log Masuk Admin / Pengawas -->
+  <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-primary text-white p-3">
+          <h6 class="modal-title fw-bold"><i class="fa-solid fa-lock me-2"></i>Log Masuk Pengawas</h6>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4 text-center">
+          <p class="text-muted small mb-3">Masukkan PIN Khas Ketua Pengawas untuk membuka akses admin.</p>
+          <input type="password" id="pinInput" class="form-control text-center fs-4 fw-bold mb-3 rounded-3" placeholder="****" maxlength="8" onkeypress="if(event.key==='Enter') loginAdmin()">
+          <div id="loginError" class="text-danger small mb-2 d-none">PIN Tidak Sah! Sila cuba lagi.</div>
+          <button class="btn btn-primary w-100 fw-bold rounded-3 py-2" onclick="loginAdmin()">Sahkan PIN</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    var currentAdminPin = "";
+    var loginModalObj = new bootstrap.Modal(document.getElementById('loginModal'));
+    var faqModalObj = new bootstrap.Modal(document.getElementById('faqModal'));
+    var chartJurusanInstance = null;
+    var chartSemesterInstance = null;
+
+    // --- TARIKH UJIAN BERTULIS (17 OKTOBER 2026, 7:30 AM) ---
+    const DATE_WRITTEN = new Date("2026-10-17T07:30:00").getTime();
+
+    // Jalankan countdown, listener scroll & tema semasa skrin dimuatkan
+    window.addEventListener('DOMContentLoaded', function() {
+      initCountdown();
+      checkSavedTheme();
+
+      window.addEventListener('scroll', function() {
+        var btnTop = document.getElementById('btnScrollTop');
+        if (window.scrollY > 250) {
+          btnTop.classList.remove('d-none');
+        } else {
+          btnTop.classList.add('d-none');
+        }
+      });
+    });
+
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showFaqModal() {
+      faqModalObj.show();
+    }
+
+    // --- FUNGSI MOD GELAP / TERANG ---
+    function toggleTheme() {
+      const htmlEl = document.documentElement;
+      const currentTheme = htmlEl.getAttribute('data-bs-theme') || 'light';
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      
+      applyTheme(newTheme);
+      localStorage.setItem('muet_theme', newTheme);
+    }
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-bs-theme', theme);
+      const icon = document.getElementById('themeIcon');
+      const text = document.getElementById('themeText');
+
+      if (theme === 'dark') {
+        icon.className = 'fa-solid fa-sun me-1 text-warning';
+        text.textContent = 'Mod Terang';
+      } else {
+        icon.className = 'fa-solid fa-moon me-1';
+        text.textContent = 'Mod Gelap';
+      }
+    }
+
+    function checkSavedTheme() {
+      const savedTheme = localStorage.getItem('muet_theme') || 'light';
+      applyTheme(savedTheme);
+    }
+
+    // --- FUNGSI PEMASA DETIK (COUNTDOWN TIMER BLOK) ---
+    function initCountdown() {
+      function updateTimer() {
+        const now = new Date().getTime();
+        const diffWritten = DATE_WRITTEN - now;
+
+        if (diffWritten <= 0) {
+          document.getElementById('countdownContainer').innerHTML = `<div class="col-12"><div class="alert alert-info fw-bold mb-0">Ujian Bertulis Telah Bermula / Tamat</div></div>`;
+          return;
+        }
+
+        const days = Math.floor(diffWritten / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diffWritten % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diffWritten % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diffWritten % (1000 * 60)) / 1000);
+
+        document.getElementById('countDays').innerText = days < 10 ? '0' + days : days;
+        document.getElementById('countHours').innerText = hours < 10 ? '0' + hours : hours;
+        document.getElementById('countMins').innerText = minutes < 10 ? '0' + minutes : minutes;
+        document.getElementById('countSecs').innerText = seconds < 10 ? '0' + seconds : seconds;
+      }
+
+      updateTimer();
+      setInterval(updateTimer, 1000);
+    }
+
+    // --- FUNGSI LOG MASUK ADMIN ---
+    function showLoginModal() {
+      document.getElementById('pinInput').value = '';
+      document.getElementById('loginError').classList.add('d-none');
+      loginModalObj.show();
+    }
+
+    function loginAdmin() {
+      var inputPin = document.getElementById('pinInput').value;
+      google.script.run.withSuccessHandler(function(isValid) {
+        if (isValid) {
+          currentAdminPin = inputPin;
+          loginModalObj.hide();
+          
+          document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('admin-only'));
+          document.getElementById('btnLogin').classList.add('d-none');
+          document.getElementById('adminStatus').classList.remove('d-none');
+        } else {
+          document.getElementById('loginError').classList.remove('d-none');
+        }
+      }).verifyAdminPin(inputPin);
+    }
+
+    function logoutAdmin() {
+      currentAdminPin = "";
+      document.querySelectorAll('#muetTab .nav-item:nth-child(3), #muetTab .nav-item:nth-child(4)').forEach(el => el.classList.add('admin-only'));
+      document.getElementById('btnLogin').classList.remove('d-none');
+      document.getElementById('adminStatus').classList.add('d-none');
+      
+      var firstTab = new bootstrap.Tab(document.getElementById('search-tab'));
+      firstTab.show();
+    }
+
+    // --- CARIAN CALON & BINA GRID MEJA (MOD CALON) ---
+    function performSearch() {
+      var query = document.getElementById('searchInput').value;
+      if (!query) return;
+
+      document.getElementById('searchSpinner').classList.remove('d-none');
+      document.getElementById('searchResults').innerHTML = '';
+
+      google.script.run.withSuccessHandler(displaySearchResults).searchCandidate(query);
+    }
+
+    function displaySearchResults(results) {
+      document.getElementById('searchSpinner').classList.add('d-none');
+      var container = document.getElementById('searchResults');
+
+      if (results.length === 0) {
+        container.innerHTML = `<div class="alert alert-warning text-center col-md-8 mx-auto rounded-3 shadow-sm"><i class="fa-solid fa-circle-exclamation me-2"></i>Tiada rekod ditemui. Sila semak semula No. Kad Pengenalan atau No. Indeks anda.</div>`;
+        return;
+      }
+
+      var html = '';
+      results.forEach(function(item) {
+        var c = item.candidateInfo;
+        var layout = item.layout;
+        var encodedData = encodeURIComponent(JSON.stringify(c));
+
+        html += `
+          <div class="card mb-4 border-0 shadow col-md-10 mx-auto animate-fade-in overflow-hidden">
+            <div class="bg-primary text-white p-3 px-4 d-flex justify-content-between align-items-center">
+              <span class="fw-bold"><i class="fa-solid fa-id-card me-2"></i>PAS PELEPASAN PEPERIKSAAN MUET</span>
+              <span class="badge bg-light text-primary fw-bold">SEMAKAN BERJAYA</span>
+            </div>
+            <div class="card-body p-4">
+              <div class="row align-items-center">
+                <div class="col-md-7">
+                  <h4 class="text-primary fw-bold mb-2">${c.nama}</h4>
+                  <p class="mb-1 text-muted small"><strong>No. KP:</strong> ${c.ic} | <strong>No. Indeks:</strong> ${c.noIndeks}</p>
+                  <p class="mb-2"><strong>Kod Jurusan:</strong> <span class="badge bg-secondary">${c.kodJurusan || '-'}</span> | <strong>Semester:</strong> <span class="badge bg-secondary">${c.semester || '-'}</span></p>
+                  <hr class="my-2 opacity-25">
+                  <p class="mb-1 small"><strong>Pusat Peperiksaan:</strong> ${c.pusat}</p>
+                  <p class="mb-1 small"><strong>Lokasi Ujian Bertulis / Dewan:</strong> <span class="badge bg-info text-dark fw-bold">${c.lokasi}</span></p>
+                  <p class="mb-1 small"><strong>Lokasi MUET Speaking:</strong> <span class="badge bg-warning text-dark fw-bold"><i class="fa-solid fa-comments me-1"></i>${c.lokasiSpeaking || 'Tidak Dinyatakan'}</span></p>
+                  <p class="mb-0 text-success small mt-2"><i class="fa-solid fa-circle-check me-1"></i>Disahkan disemak pada: ${c.masaSemakan}</p>
+                </div>
+                <div class="col-md-5 text-md-end text-start pt-3 pt-md-0 border-top border-top-md-0">
+                  <div class="p-3 bg-light rounded-4 text-center mb-3 border border-success border-2 shadow-sm">
+                    <small class="text-muted d-block fw-bold" style="font-size:0.75rem;">NOMBOR MEJA ANDA</small>
+                    <span class="display-4 fw-bold text-success">${c.noMeja}</span>
+                    <small class="d-block text-muted fw-semibold">Kedudukan: Baris ${c.baris}, Lajur ${c.lajur}</small>
+                  </div>
+                  <button class="btn btn-outline-primary w-100 mb-2 fw-bold rounded-3" onclick="printDeskSlip('${encodedData}')">
+                    <i class="fa-solid fa-print me-1"></i> Cetak Slip Kedudukan Meja
+                  </button>
+                  ${c.slipUrl ? `<a href="${c.slipUrl}" target="_blank" class="btn btn-success w-100 fw-bold rounded-3"><i class="fa-solid fa-file-pdf me-1"></i> Muat Turun Slip MUET Rasmi</a>` : ''}
+                </div>
+              </div>
+
+              <!-- GRID KEDUDUKAN MEJA ANONYMIZED UNTUK CALON -->
+              <hr class="my-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-map-pin me-2 text-danger"></i>Pelan Kedudukan Meja Anda di Dewan (${c.lokasi})</h6>
+                <div class="small">
+                  <span class="badge bg-success me-1">MEJA ANDA</span>
+                  <span class="badge bg-secondary">Calon Lain</span>
+                </div>
+              </div>
+              
+              ${renderAnonymizedGrid(layout)}
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    // FUNGSI CETAK SLIP KEDUDUKAN MEJA (PRINT SLIP)
+    function printDeskSlip(encodedData) {
+      var c = JSON.parse(decodeURIComponent(encodedData));
+      var printWin = window.open('', '_blank', 'width=800,height=900');
+      
+      var slipHtml = `
+        <!DOCTYPE html>
+        <html lang="ms">
+        <head>
+          <meta charset="UTF-8">
+          <title>Slip Kedudukan Meja MUET 2026 - ${c.nama}</title>
+          <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+          <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+          <style>
+            body { font-family: 'Segoe UI', Arial, sans-serif; padding: 20px; background-color: #fff; color: #000; }
+            .slip-card { border: 2px dashed #0d6efd; border-radius: 12px; padding: 25px; max-width: 650px; margin: 0 auto; }
+            .desk-badge { background-color: #e8f5e9; border: 2px solid #198754; border-radius: 10px; padding: 15px; text-align: center; }
+            @media print {
+              .no-print { display: none !important; }
+              .slip-card { border: 2px solid #000; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="text-center no-print mb-4">
+            <button onclick="window.print()" class="btn btn-primary btn-lg fw-bold me-2"><i class="fa-solid fa-print me-1"></i> Cetak / Simpan PDF</button>
+            <button onclick="window.close()" class="btn btn-secondary btn-lg">Tutup</button>
+          </div>
+
+          <div class="slip-card shadow-sm">
+            <div class="text-center mb-3">
+              <h4 class="fw-bold mb-1 text-primary"><i class="fa-solid fa-graduation-cap me-2"></i>PORTAL SEMAKAN MUET 2026</h4>
+              <p class="text-uppercase fw-bold text-muted small mb-0">SLIP KEDUDUKAN MEJA & NAVIGASI PEPERIKSAAN CALON</p>
+              <hr class="my-2">
+            </div>
+
+            <table class="table table-borderless align-middle mb-2 fs-6">
+              <tr><td width="38%" class="fw-bold text-muted">NAMA CALON:</td><td class="fw-bold fs-5">${c.nama}</td></tr>
+              <tr><td class="fw-bold text-muted">NO. KAD PENGENALAN:</td><td class="fw-bold">${c.ic}</td></tr>
+              <tr><td class="fw-bold text-muted">NO. INDEKS:</td><td class="fw-bold">${c.noIndeks}</td></tr>
+              <tr><td class="fw-bold text-muted">KOD JURUSAN / SEM:</td><td>${c.kodJurusan || '-'} / Sem ${c.semester || '-'}</td></tr>
+              <tr><td class="fw-bold text-muted">PUSAT PEPERIKSAAN:</td><td>${c.pusat}</td></tr>
+              <tr><td class="fw-bold text-muted">DEWAN UJIAN BERTULIS:</td><td class="fw-bold text-primary">${c.lokasi}</td></tr>
+              <tr><td class="fw-bold text-muted">LOKASI MUET SPEAKING:</td><td class="fw-bold text-dark">${c.lokasiSpeaking || '-'}</td></tr>
+              <tr><td class="fw-bold text-muted">TARIKH & MASA SEMAKAN:</td><td class="small text-muted">${c.masaSemakan}</td></tr>
+            </table>
+
+            <div class="desk-badge my-3">
+              <small class="text-muted fw-bold d-block">NOMBOR MEJA PEPERIKSAAN</small>
+              <span class="display-3 fw-bold text-success">${c.noMeja}</span>
+              <div class="fw-bold text-dark fs-6 mt-1">KEDUDUKAN: BARIS ${c.baris}, LAJUR ${c.lajur}</div>
+            </div>
+
+            <div class="alert alert-secondary text-center small mb-0">
+              <strong>PERINGATAN:</strong> Sila bawa slip ini bersama MyKad Asal dan Slip Pendaftaran Peperiksaan MUET ke dewan peperiksaan.
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
+
+      printWin.document.write(slipHtml);
+      printWin.document.close();
+    }
+
+    // Fungsi Render Grid Meja Anonymized Calon dengan Indikator Orientasi Dewan
+    function renderAnonymizedGrid(layout) {
+      if (!layout || layout.length === 0) {
+        return '<div class="alert alert-secondary text-center small">Tiada maklumat pelan meja bagi lokasi ini.</div>';
+      }
+
+      var validLayout = layout.map(function(item) {
+        return {
+          noMeja: item.noMeja,
+          baris: parseInt(item.baris, 10) || 0,
+          lajur: parseInt(item.lajur, 10) || 0,
+          isSelf: item.isSelf
+        };
+      }).filter(function(item) { return item.baris > 0 && item.lajur > 0; });
+
+      if (validLayout.length === 0) {
+        return '<div class="alert alert-warning text-center small">Maklumat kedudukan Baris / Lajur meja calon belum dikemaskini dalam fail Google Sheet.</div>';
+      }
+
+      var maxBaris = 0;
+      var maxLajur = 0;
+      validLayout.forEach(function(item) {
+        if (item.baris > maxBaris) maxBaris = item.baris;
+        if (item.lajur > maxLajur) maxLajur = item.lajur;
+      });
+
+      var grid = {};
+      validLayout.forEach(function(item) {
+        grid[item.baris + '_' + item.lajur] = item;
+      });
+
+      var html = '<div class="stage-indicator text-center mb-3 shadow-sm"><i class="fa-solid fa-chalkboard-user me-2"></i>PENTAS / PAPAN TULIS (HADAPAN DEWAN)</div>';
+      html += '<div class="table-responsive"><table class="table table-bordered text-center align-middle mb-0">';
+      
+      for (var r = 1; r <= maxBaris; r++) {
+        html += '<tr>';
+        for (var c = 1; c <= maxLajur; c++) {
+          var desk = grid[r + '_' + c];
+          if (desk) {
+            if (desk.isSelf) {
+              html += `
+                <td style="min-width: 110px;" class="p-1">
+                  <div class="desk-box self-desk">
+                    <span class="badge bg-success mb-1" style="font-size:0.6rem;">MEJA ANDA</span>
+                    <div class="desk-number">Meja ${desk.noMeja}</div>
+                    <small class="text-success fw-bold" style="font-size:0.65rem;">B${desk.baris}-L${desk.lajur}</small>
+                  </div>
+                </td>`;
+            } else {
+              html += `
+                <td style="min-width: 110px;" class="p-1">
+                  <div class="desk-box occupied">
+                    <div class="desk-number text-muted">Meja ${desk.noMeja}</div>
+                    <small class="text-muted" style="font-size:0.65rem;">B${desk.baris}-L${desk.lajur}</small>
+                  </div>
+                </td>`;
+            }
+          } else {
+            html += `
+              <td style="min-width: 110px;" class="p-1">
+                <div class="desk-box bg-light text-muted opacity-50">
+                  <small class="d-block text-muted" style="font-size:0.7rem;">Kosong</small>
+                  <small style="font-size:0.6rem;">B${r}-L${c}</small>
+                </div>
+              </td>`;
+          }
+        }
+        html += '</tr>';
+      }
+      html += '</table></div>';
+      html += '<div class="text-center mt-3 text-muted small fw-medium"><i class="fa-solid fa-door-open me-1 text-danger"></i> PINTU MASUK DEWAN (BELAKANG DEWAN)</div>';
+      
+      return html;
+    }
+
+    // --- GRID PENUH DEWAN BESERTA INDIKATOR SEMAKAN (ADMIN ONLY) ---
+    function loadLocations() {
+      var select = document.getElementById('locationSelect');
+      if (select.children.length > 1) return;
+
+      google.script.run.withSuccessHandler(function(res) {
+        if (res.error) { alert(res.error); return; }
+        res.locations.forEach(function(loc) {
+          var option = document.createElement('option');
+          option.value = loc;
+          option.textContent = loc;
+          select.appendChild(option);
+        });
+      }).getLocations(currentAdminPin);
+    }
+
+    function renderSeatingPlan() {
+      var location = document.getElementById('locationSelect').value;
+      var container = document.getElementById('seatingGridContainer');
+      if (!location) { container.innerHTML = ''; return; }
+
+      container.innerHTML = `<div class="text-center my-5"><div class="spinner-border text-primary"></div></div>`;
+
+      google.script.run.withSuccessHandler(function(res) {
+        if (res.error) { container.innerHTML = `<div class="alert alert-danger">${res.error}</div>`; return; }
+        var candidates = res.candidates;
+        
+        if (candidates.length === 0) {
+          container.innerHTML = `<div class="alert alert-info text-center">Tiada data calon untuk lokasi ini.</div>`;
+          return;
+        }
+
+        var maxBaris = Math.max(...candidates.map(c => c.baris));
+        var maxLajur = Math.max(...candidates.map(c => c.lajur));
+
+        var grid = {};
+        candidates.forEach(c => { grid[`${c.baris}_${c.lajur}`] = c; });
+
+        var html = `<div class="card shadow-sm border-0"><div class="card-body"><h5 class="card-title text-center mb-4 fw-bold text-primary">Pelan Meja Peperiksaan - ${location}</h5>`;
+        html += '<div class="stage-indicator text-center mb-3 shadow-sm"><i class="fa-solid fa-chalkboard-user me-2"></i>PENTAS / PAPAN TULIS (HADAPAN DEWAN)</div>';
+        html += `<div class="table-responsive"><table class="table table-bordered text-center align-middle">`;
+
+        for (var r = 1; r <= maxBaris; r++) {
+          html += `<tr>`;
+          for (var c = 1; c <= maxLajur; c++) {
+            var item = grid[`${r}_${c}`];
+            if (item) {
+              var isChecked = item.masaSemakan && item.masaSemakan !== '';
+              var boxClass = isChecked ? 'checked-in' : 'occupied border-primary';
+
+              html += `
+                <td style="min-width: 130px;" class="p-1">
+                  <div class="desk-box ${boxClass}">
+                    ${isChecked ? `<span class="badge bg-success" style="font-size:0.6rem;"><i class="fa-solid fa-check me-1"></i>Telah Semak</span>` : ''}
+                    <div class="desk-number ${isChecked ? 'text-success' : 'text-primary'}">Meja ${item.noMeja}</div>
+                    <div class="candidate-name" title="${item.nama}">${item.nama}</div>
+                    <small class="text-muted d-block" style="font-size:0.65rem;">B${item.baris}-L${item.lajur}</small>
+                    ${item.lokasiSpeaking ? `<small class="badge bg-warning text-dark p-1 mt-1" style="font-size:0.58rem;">Spk: ${item.lokasiSpeaking}</small>` : ''}
+                  </div>
+                </td>`;
+            } else {
+              html += `
+                <td style="min-width: 130px;" class="p-1">
+                  <div class="desk-box bg-light text-muted">
+                    <small class="d-block text-muted">Kosong</small>
+                    <small style="font-size:0.65rem;">B${r}-L${c}</small>
+                  </div>
+                </td>`;
+            }
+          }
+          html += `</tr>`;
+        }
+
+        html += `</table></div>`;
+        html += '<div class="text-center mt-3 text-muted small fw-medium"><i class="fa-solid fa-door-open me-1 text-danger"></i> PINTU MASUK DEWAN (BELAKANG DEWAN)</div>';
+        html += `</div></div>`;
+        
+        container.innerHTML = html;
+      }).getSeatingPlan(location, currentAdminPin);
+    }
+
+    // --- ANALISIS, STATISTIK & CARTA (ADMIN ONLY) ---
+    function loadAnalytics() {
+      var container = document.getElementById('analyticsContainer');
+      google.script.run.withSuccessHandler(function(stats) {
+        if (stats.error) { container.innerHTML = `<div class="alert alert-danger">${stats.error}</div>`; return; }
+
+        var percentChecked = ((stats.checked / stats.total) * 100).toFixed(1);
+
+        var html = `
+          <!-- KPI Cards -->
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <div class="card shadow-sm border-0 p-3 bg-white border-start border-4 border-primary">
+                <h6 class="text-muted mb-1 small fw-bold">JUMLAH KESELURUHAN CALON</h6>
+                <h2 class="fw-bold text-primary mb-0">${stats.total} Orang Calon</h2>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card shadow-sm border-0 p-3 bg-white border-start border-4 border-success">
+                <h6 class="text-muted mb-1 small fw-bold">CALON TELAH MEMBUAT SEMAKAN</h6>
+                <h2 class="fw-bold text-success mb-0">${stats.checked} / ${stats.total} Calon <span class="fs-6 text-muted">(${percentChecked}%)</span></h2>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section Carta Jurusan & Semester -->
+          <div class="row g-4 mb-4">
+            <div class="col-lg-7">
+              <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                  <h6 class="card-title fw-bold mb-3 text-primary"><i class="fa-solid fa-chart-column me-2"></i>Bilangan Calon Mengikut Kod Jurusan</h6>
+                  <div style="position: relative; height:280px;">
+                    <canvas id="jurusanChart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-5">
+              <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                  <h6 class="card-title fw-bold mb-3 text-primary"><i class="fa-solid fa-chart-pie me-2"></i>Bilangan Calon Mengikut Semester</h6>
+                  <div style="position: relative; height:280px;">
+                    <canvas id="semesterChart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section Jadual Lokasi & Pusat -->
+          <div class="row g-4">
+            <div class="col-md-6">
+              <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                  <h6 class="card-title mb-3 fw-bold">Pecahan Calon Mengikut Lokasi Dewan</h6>
+                  <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                      <thead><tr><th>Lokasi Dewan / Bilik</th><th class="text-end">Jumlah</th><th class="text-end">Peratus</th></tr></thead>
+                      <tbody>`;
+          
+          for (var loc in stats.byLocation) {
+            var count = stats.byLocation[loc];
+            var percent = ((count / stats.total) * 100).toFixed(1);
+            html += `<tr><td><i class="fa-solid fa-door-open me-2 text-primary"></i>${loc}</td><td class="text-end fw-bold">${count}</td><td class="text-end"><span class="badge bg-secondary">${percent}%</span></td></tr>`;
+          }
+
+          html += `   </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                  <h6 class="card-title mb-3 fw-bold">Pecahan Calon Mengikut Pusat</h6>
+                  <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                      <thead><tr><th>Kod Pusat</th><th class="text-end">Jumlah</th><th class="text-end">Peratus</th></tr></thead>
+                      <tbody>`;
+          
+          for (var center in stats.byCenter) {
+            var countC = stats.byCenter[center];
+            var percentC = ((countC / stats.total) * 100).toFixed(1);
+            html += `<tr><td><i class="fa-solid fa-building-columns me-2 text-success"></i>${center}</td><td class="text-end fw-bold">${countC}</td><td class="text-end"><span class="badge bg-secondary">${percentC}%</span></td></tr>`;
+          }
+
+          html += `   </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        container.innerHTML = html;
+
+        // Render Carta Menggunakan Chart.js
+        renderCharts(stats.byJurusan, stats.bySemester);
+
+      }).getAnalytics(currentAdminPin);
+    }
+
+    function renderCharts(jurusanData, semesterData) {
+      if (chartJurusanInstance) chartJurusanInstance.destroy();
+      if (chartSemesterInstance) chartSemesterInstance.destroy();
+
+      // 1. Carta Bar - Kod Jurusan
+      var ctxJurusan = document.getElementById('jurusanChart').getContext('2d');
+      var jurusanLabels = Object.keys(jurusanData);
+      var jurusanCounts = Object.values(jurusanData);
+
+      chartJurusanInstance = new Chart(ctxJurusan, {
+        type: 'bar',
+        data: {
+          labels: jurusanLabels,
+          datasets: [{
+            label: 'Bilangan Calon',
+            data: jurusanCounts,
+            backgroundColor: '#0d6efd',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        }
+      });
+
+      // 2. Carta Doughnut - Semester
+      var ctxSemester = document.getElementById('semesterChart').getContext('2d');
+      var semesterLabels = Object.keys(semesterData);
+      var semesterCounts = Object.values(semesterData);
+
+      chartSemesterInstance = new Chart(ctxSemester, {
+        type: 'doughnut',
+        data: {
+          labels: semesterLabels,
+          datasets: [{
+            data: semesterCounts,
+            backgroundColor: ['#198754', '#ffc107', '#0dcaf0', '#fd7e14', '#6f42c1', '#d63384']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom' } }
+        }
+      });
+    }
+  </script>
+</body>
+</html>
